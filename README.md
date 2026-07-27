@@ -1,4 +1,4 @@
-# Hospital Bed Occupancy Predictor — AWS EC2 Deployment
+# Clinical Bed Demand Forecasting API & Infrastructure
 
 A Ridge Regression REST API that predicts 30-day hospital bed occupancy from patient clinical features, trained on real MSc coursework data and deployed as a live service on **AWS EC2 (London region)** with a **GitHub Actions CI/CD pipeline**.
 
