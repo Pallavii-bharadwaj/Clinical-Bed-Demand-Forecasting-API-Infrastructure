@@ -2,7 +2,7 @@
 
 A Ridge Regression REST API that predicts 30-day hospital bed occupancy from patient clinical features, trained on real MSc coursework data and deployed to **AWS EC2 (London region)** with a **GitHub Actions CI/CD pipeline** that runs on every push.
 
-https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/tree/main/.github/workflows
+https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/actions/workflows/deploy.yml/badge.svg
 
 ## Status
 
