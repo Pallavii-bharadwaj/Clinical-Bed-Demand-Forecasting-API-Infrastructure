@@ -2,6 +2,8 @@
 
 A Ridge Regression REST API that predicts 30-day hospital bed occupancy from patient clinical features, trained on real MSc coursework data and deployed to **AWS EC2 (London region)** with a **GitHub Actions CI/CD pipeline** that runs on every push.
 
+https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/tree/main/.github/workflows
+
 ## Status
 
 The API is packaged to deploy to AWS EC2 (eu-west-2) and run as a FastAPI service on port 8000. The EC2 instance is spun up on demand rather than left running continuously, so the public endpoint is not always live. The GitHub Actions pipeline runs on every push and is the standing proof that the service builds, trains, starts, and passes its health check.
