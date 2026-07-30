@@ -1,8 +1,8 @@
+[![CI/CD](https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/actions/workflows/deploy.yml/badge.svg)](https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/actions)
+
 # Clinical Bed Demand Forecasting API & Infrastructure
 
-A Ridge Regression REST API that predicts 30-day hospital bed occupancy from patient clinical features, trained on real MSc coursework data and deployed to **AWS EC2 (London region)** with a **GitHub Actions CI/CD pipeline** that runs on every push.
-
-https://github.com/Pallavii-bharadwaj/Clinical-Bed-Demand-Forecasting-API-Infrastructure/actions/workflows/deploy.yml/badge.svg
+A Ridge Regression REST API that predicts 30-day hospital bed occupancy from patient clinical features, trained on anonymised MSc coursework data, containerised with **Docker**, and deployed to **AWS EC2 (London region)** with a **GitHub Actions CI/CD pipeline** that runs on every push.
 
 ## Status
 
@@ -28,7 +28,7 @@ curl -X POST http://<instance-host>:8000/predict \
 
 ## Model
 
-Trained on 2,400 real patient records from MSc Data Science coursework (University of York, DEEP Q1).
+Trained on 2,400 records from an anonymised clinical dataset provided for MSc Data Science coursework (University of York, DEEP Q1).
 
 **Features:** age, Charlson Comorbidity Index (cci), length-of-stay index, prior admissions (12m), CRP, creatinine, carer status, IMD deprivation decile, hospital site.
 
@@ -58,12 +58,12 @@ GitHub (push to main)
 GitHub Actions CI/CD
   ├── Install dependencies
   ├── Train model (train_model.py)
-  ├── Start FastAPI server
-  └── Test /health endpoint
+  ├── Test /health endpoint (direct)
+  └── Build Docker image + health-check the container
        │
        ▼
 AWS EC2 t3.micro (eu-west-2, London)
-  └── FastAPI + Uvicorn (port 8000)
+  └── Docker container: FastAPI + Uvicorn (port 8000)
         ├── GET  /health
         └── POST /predict
 ```
@@ -75,6 +75,7 @@ AWS EC2 t3.micro (eu-west-2, London)
 - **Cloud:** AWS EC2 t3.micro, eu-west-2 (London)
 - **API:** Python, FastAPI, Uvicorn
 - **ML:** Scikit-learn, Pandas, NumPy, Joblib
+- **Container:** Docker
 - **CI/CD:** GitHub Actions (auto-runs on every push to main)
 - **OS:** Amazon Linux 2023
 
@@ -101,17 +102,37 @@ Then open `http://localhost:8000/docs` for the interactive API docs.
 
 ---
 
+## Run with Docker
+
+The service is containerised, so it runs the same way anywhere without installing Python or dependencies directly:
+
+```
+# Build the image (trains the model during the build)
+docker build -t hospital-bed-api .
+
+# Run the container
+docker run -p 8000:8000 hospital-bed-api
+```
+
+Then open `http://localhost:8000/health` to confirm the service is running. The Docker build and container health check also run automatically in CI on every push.
+
+---
+
 ## CI/CD Pipeline
 
-Every push to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`) which:
+Every push to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`), which runs two jobs:
 
+**Test job**
 1. Sets up Python 3.11
 2. Installs all dependencies
 3. Trains the Ridge Regression model
-4. Starts the FastAPI server
-5. Tests the `/health` endpoint with `curl`
+4. Starts the FastAPI server and tests the `/health` endpoint with `curl`
 
-If any step fails, the pipeline reports a failure, keeping the main branch always deployable.
+**Docker build job**
+1. Builds the Docker image
+2. Runs the container and health-checks the `/health` endpoint inside it
+
+If any step fails, the pipeline reports a failure, keeping the main branch always deployable and the container always buildable.
 
 ---
 
@@ -123,9 +144,11 @@ Clinical-Bed-Demand-Forecasting-API-Infrastructure/
 ├── main.py                         # FastAPI service
 ├── hospital_bed_days_regression_data.csv
 ├── requirements.txt
+├── Dockerfile                      # containerises the service
+├── .dockerignore
 └── .github/
     └── workflows/
-        └── deploy.yml              # CI/CD pipeline
+        └── deploy.yml              # CI/CD pipeline (test + Docker build)
 ```
 
 ---
